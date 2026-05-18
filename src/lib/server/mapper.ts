@@ -7,7 +7,7 @@ export function buildDateRange(days: number): string[] {
 	for (let i = days - 1; i >= 0; i--) {
 		const d = new Date(today);
 		d.setDate(d.getDate() - i);
-		dates.push(d.toISOString().slice(0, 10));
+		dates.push(d.toISOString());
 	}
 	return dates;
 }
@@ -16,7 +16,7 @@ export function buildTimeTable(
 	entries: TogglTimeEntry[],
 	dates: string[]
 ): TimeTable {
-	const dateIndex = new Map(dates.map((d, i) => [d, i]));
+	const dateIndex = new Map(dates.map((d, i) => [d.slice(0, 10), i]));
 	const projectMap = new Map(projects.map((p) => [p.id, p]));
 	const rowMap = new Map<number, ProjectRow>();
 
@@ -24,6 +24,7 @@ export function buildTimeTable(
 		if (entry.duration < 0 || entry.project_id === null) continue;
 
 		const i = dateIndex.get(entry.start.slice(0, 10));
+
 		if (i === undefined) continue;
 
 		if (!rowMap.has(entry.project_id)) {
