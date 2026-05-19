@@ -91,17 +91,6 @@
 		</form>
 	</div>
 
-	<div class="flex gap-4 justify-center ">
-		<label>
-			<input type="checkbox" bind:checked={roundToHalf} />
-			30m rounding
-		</label>
-
-		<label>
-			<input type="checkbox" bind:checked={lunchDeduct} />
-			Deduct lunch
-		</label>
-	</div>
 
 	<div>
 		{#if form?.error}
@@ -110,6 +99,19 @@
 
 		{#if timetable}
 			{@const { dates, rows, dailyTotals } = timetable!}
+
+			<div class="flex justify-center gap-4">
+				<label>
+					<input type="checkbox" bind:checked={roundToHalf} />
+					30m rounding
+				</label>
+
+				<label>
+					<input type="checkbox" bind:checked={lunchDeduct} />
+					Deduct lunch
+				</label>
+			</div>
+
 			<table>
 				<thead class="border-b-1 border-white">
 					<tr>
@@ -131,7 +133,7 @@
 						</tr>
 					{/each}
 				</tbody>
-<!-- 				<tfoot>
+				<!-- 				<tfoot>
 					<tr>
 						<td>Total</td>
 						{#each dailyTotals as total, i (i)}
