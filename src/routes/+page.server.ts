@@ -12,13 +12,16 @@ export const actions: Actions = {
 		}
 
 		const dates = buildDateRange(7);
+
 		const start = dates[0];
-		const end = dates[dates.length - 1];
+		const end = new Date();
+		end.setDate(end.getDate() + 1);
+		const endStr = end.toISOString().slice(0, 10);
 
 		try {
 			const [projects, entries] = await Promise.all([
 				fetchProjects(token),
-				fetchTimeEntries(token, start, end)
+				fetchTimeEntries(token, start, endStr)
 			]);
 
 			return { timetable: buildTimeTable(projects, entries, dates) };

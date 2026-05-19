@@ -7,7 +7,7 @@ export function buildDateRange(days: number): string[] {
 	for (let i = days - 1; i >= 0; i--) {
 		const d = new Date(today);
 		d.setDate(d.getDate() - i);
-		dates.push(d.toISOString());
+		dates.push(d.toISOString().slice(0, 10));
 	}
 	return dates;
 }
@@ -16,29 +16,49 @@ export function buildTimeTable(
 	entries: TogglTimeEntry[],
 	dates: string[]
 ): TimeTable {
-	const dateIndex = new Map(dates.map((d, i) => [d.slice(0, 10), i]));
+
+	const dateIndex = new Map(dates.map((d, i) => [d, i]));
 	const projectMap = new Map(projects.map((p) => [p.id, p]));
 	const rowMap = new Map<number, ProjectRow>();
+	const NO_PROJECT_ID = 0
+
 
 	for (const entry of entries) {
-		if (entry.duration < 0 || entry.project_id === null) continue;
+		if (entry.duration < 0) continue;
 
-		const i = dateIndex.get(entry.start.slice(0, 10));
+		const entryDate = entry.start.slice(0, 10)
+		const i = dateIndex.get(entryDate);
 
 		if (i === undefined) continue;
 
-		if (!rowMap.has(entry.project_id)) {
-			const p = projectMap.get(entry.project_id);
-			if (!p) continue;
-			rowMap.set(entry.project_id, {
-				id: p.id,
-				name: p.name,
-				color: p.color,
-				hours: new Array(dates.length).fill(0)
-			});
+		const projectId = entry.project_id ?? NO_PROJECT_ID
+
+		if (!rowMap.has(projectId)) {
+
+			if (projectId === NO_PROJECT_ID) {
+				rowMap.set(projectId, {
+					id: projectId,
+					name: "NoName",
+					color: "white",
+					hours: new Array(dates.length).fill(0)
+				});
+
+			} else {
+				const p = projectMap.get(projectId);
+				if (!p) continue;
+				rowMap.set(projectId, {
+					id: p.id,
+					name: p.name,
+					color: p.color,
+					hours: new Array(dates.length).fill(0)
+				});
+			}
+
+
+
 		}
 
-		rowMap.get(entry.project_id)!.hours[i] += entry.duration / 3600;
+		rowMap.get(projectId)!.hours[i] += entry.duration / 3600;
 	}
 
 	const rows = [...rowMap.values()];
